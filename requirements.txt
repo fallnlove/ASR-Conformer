@@ -11,6 +11,7 @@ wandb
 comet_ml
 hydra-core
 pytest
+editdistance
 
 black
 isort
