@@ -1,7 +1,9 @@
+from typing import Union
+
 import torch
 
 
-def collate_fn(dataset_items: list[dict]):
+def collate_fn(dataset_items: list[dict]) -> dict[Union[torch.Tensor, list]]:
     """
     Collate and pad fields in the dataset items.
     Converts individual items into a batch.
@@ -10,8 +12,20 @@ def collate_fn(dataset_items: list[dict]):
         dataset_items (list[dict]): list of objects from
             dataset.__getitem__.
     Returns:
-        result_batch (dict[Tensor]): dict, containing batch-version
+        result_batch (dict[Union[Tensor, list]]): dict, containing batch-version
             of the tensors.
     """
 
-    pass  # TODO
+    return {
+        "audio": [item["audio"] for item in dataset_items],
+        "spectrogram": torch.nn.utils.rnn.pad_sequence(
+            [item["spectrogram"].transpose(-1, -2) for item in dataset_items],
+            batch_first=True,
+        ).transpose(-1, -2),
+        "text": [item["text"] for item in dataset_items],
+        "text_encoded": torch.nn.utils.rnn.pad_sequence(
+            [item["text_encoded"] for item in dataset_items],
+            batch_first=True,
+        ),
+        "audio_path": [item["audio_path"] for item in dataset_items],
+    }

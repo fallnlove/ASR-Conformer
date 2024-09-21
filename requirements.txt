@@ -12,6 +12,8 @@ comet_ml
 hydra-core
 pytest
 editdistance
+datasets
+wget
 
 black
 isort
