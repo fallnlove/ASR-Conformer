@@ -14,8 +14,5 @@ def test_wer():
     assert calc_wer("zvuuuuk zvuuk", "zvuuuuk zvuuk") == 0
     assert calc_wer("moscow hse", "hse") == 1 / 2
     assert calc_wer("hse", "wow broooo") == 2
-    assert (
-        calc_wer("hdi lab intern po xuyne ne pisat", "hdi lab intern po xuyne pisat")
-        == 1 / 7
-    )
+    assert calc_wer("hdi lab intern", "hdi lab") == 1 / 3
     assert calc_wer("computer", "") == 1
