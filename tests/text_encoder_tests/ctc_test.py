@@ -5,7 +5,7 @@ def test_ctc_decode():
     encoder = CTCTextEncoder()
 
     assert (
-        encoder.ctc_decode(
+        encoder._ctc_decode(
             [
                 encoder.char2ind[v]
                 for v in [

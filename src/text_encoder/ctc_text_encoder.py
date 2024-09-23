@@ -1,20 +1,19 @@
 import re
+from abc import abstractmethod
 from string import ascii_lowercase
+from typing import List
 
 import torch
-
-# TODO add BPE, LM, Beam Search support
-# Note: think about metrics and encoder
-# The design can be remarkably improved
-# to calculate stuff more efficiently and prettier
+from torch import Tensor
 
 
 class CTCTextEncoder:
     EMPTY_TOK = ""
 
-    def __init__(self, alphabet=None, **kwargs):
+    def __init__(self, use_bpe: bool = False, alphabet=None, **kwargs):
         """
         Args:
+            use_bpe (bool): flag to use BPE
             alphabet (list): alphabet for language. If None, it will be
                 set to ascii
         """
@@ -22,6 +21,7 @@ class CTCTextEncoder:
         if alphabet is None:
             alphabet = list(ascii_lowercase + " ")
 
+        self.use_bpe = use_bpe
         self.alphabet = alphabet
         self.vocab = [self.EMPTY_TOK] + list(self.alphabet)
 
@@ -45,19 +45,27 @@ class CTCTextEncoder:
                 f"Can't encode text '{text}'. Unknown chars: '{' '.join(unknown_chars)}'"
             )
 
-    def decode(self, inds) -> str:
+    @abstractmethod
+    def decode(self, log_probs: Tensor, log_probs_length: Tensor) -> List[str]:
         """
-        Raw decoding without CTC.
-        Used to validate the CTC decoding implementation.
+        Decoding wit CTC.
 
         Args:
-            inds (list): list of tokens.
+            log_probs (Tensor): Tensor of shape (B, len(alphabet), M) contains logits
+            log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
         Returns:
-            raw_text (str): raw text with empty tokens and repetitions.
+            result (list[str]): decoded texts.
         """
-        return "".join([self.ind2char[int(ind)] for ind in inds]).strip()
 
-    def ctc_decode(self, inds) -> str:
+        argmax_inds = log_probs.cpu().argmax(-2).numpy()
+        result = [
+            self._ctc_decode(inds[: int(ind_len)])
+            for inds, ind_len in zip(argmax_inds, log_probs_length.numpy())
+        ]
+
+        return result
+
+    def _ctc_decode(self, inds) -> str:
         """
         Decoding wit CTC.
 

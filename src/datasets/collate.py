@@ -22,6 +22,9 @@ def collate_fn(dataset_items: list[dict]) -> dict[Union[torch.Tensor, list]]:
             [item["spectrogram"].transpose(-1, -2) for item in dataset_items],
             batch_first=True,
         ).transpose(-1, -2),
+        "spectrogram_length": torch.Tensor(
+            [item["spectrogram"].shape[1] for item in dataset_items],
+        ),
         "text": [item["text"] for item in dataset_items],
         "text_encoded": torch.nn.utils.rnn.pad_sequence(
             [item["text_encoded"] for item in dataset_items],

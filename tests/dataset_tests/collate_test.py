@@ -48,6 +48,9 @@ def collate_test():
                 ],
             ]
         ),
+        "spectrogram_length": torch.Tensor(
+            [5, 3],
+        ),
         "text": [
             "abobus",
             "sound",
