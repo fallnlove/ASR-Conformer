@@ -16,7 +16,7 @@ def test_ctc_decode():
                     [0.2, 0.1, 0.3, 0.7],
                     [0.3, 0.5, 0.6, 0.1],
                 ]
-            ),
+            ).T,
             1,
         )
         == base_encoder.decode(
@@ -28,7 +28,7 @@ def test_ctc_decode():
                         [0.3, 0.5, 0.6, 0.1],
                     ]
                 ]
-            ),
+            ).transpose(0, 1),
             torch.Tensor([4]),
         )[0]
     )
@@ -41,7 +41,7 @@ def test_ctc_decode():
                     [0.49, 0.49, 0.49],
                     [0.01, 0.5, 0.01],
                 ]
-            ),
+            ).T,
             10,
         )
         == "a"

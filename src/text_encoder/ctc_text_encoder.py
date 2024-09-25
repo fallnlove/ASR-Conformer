@@ -51,13 +51,13 @@ class CTCTextEncoder:
         Decoding wit CTC.
 
         Args:
-            log_probs (Tensor): Tensor of shape (B, len(alphabet), M) contains logits
+            log_probs (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
             log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
         Returns:
             result (list[str]): decoded texts.
         """
 
-        argmax_inds = log_probs.cpu().argmax(-2).numpy()
+        argmax_inds = log_probs.cpu().argmax(-1).numpy()
         result = [
             self._ctc_decode(inds[: int(ind_len)])
             for inds, ind_len in zip(argmax_inds, log_probs_length.numpy())

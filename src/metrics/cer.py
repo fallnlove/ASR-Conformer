@@ -16,7 +16,7 @@ class CERMetric(BaseMetric):
         self, log_probs: Tensor, log_probs_length: Tensor, text: List[str], **kwargs
     ):
         cers = []
-        predicted_texts = self.text_encoder(log_probs, log_probs_length)
+        predicted_texts = self.text_encoder.decode(log_probs, log_probs_length)
         for pred_text, target_text in zip(predicted_texts, text):
             cers.append(calc_cer(target_text, pred_text))
         return sum(cers) / len(cers)

@@ -1,4 +1,5 @@
 from pathlib import Path
+from random import randint
 
 import pandas as pd
 
@@ -78,16 +79,27 @@ class Trainer(BaseTrainer):
 
         # logging scheme might be different for different partitions
         if mode == "train":  # the method is called only every self.log_step steps
+            self.log_audio(**batch)
             self.log_spectrogram(**batch)
         else:
             # Log Stuff
+            self.log_audio(**batch)
             self.log_spectrogram(**batch)
             self.log_predictions(**batch)
 
     def log_spectrogram(self, spectrogram, **batch):
-        spectrogram_for_plot = spectrogram[0].detach().cpu()
+        idx = randint(0, spectrogram.shape[0] - 1)
+
+        spectrogram_for_plot = spectrogram[idx].detach().cpu()
         image = plot_spectrogram(spectrogram_for_plot)
         self.writer.add_image("spectrogram", image)
+
+    def log_audio(self, audio, sample_rate, audio_path, **batch):
+        idx = randint(0, len(audio) - 1)
+
+        audio_for_logging = audio[idx].detach().cpu()
+        name = Path(audio_path[idx]).name
+        self.writer.add_audio(name, audio_for_logging, sample_rate=sample_rate[idx])
 
     def log_predictions(
         self, text, log_probs, log_probs_length, audio_path, examples_to_log=10, **batch

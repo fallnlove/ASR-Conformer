@@ -16,6 +16,7 @@ def collate_test():
             "text": "abobus",
             "text_encoded": torch.tensor([0, 8, 4, 2, 5]),
             "audio_path": "/home/audio/1",
+            "sample_rate": 16000,
         },
         {
             "audio": torch.tensor([0, 0.3, -0.2, 1]),
@@ -28,6 +29,7 @@ def collate_test():
             "text": "sound",
             "text_encoded": torch.tensor([1, 3, 5]),
             "audio_path": "/home/audio/2",
+            "sample_rate": 16000,
         },
     ]
 
@@ -64,6 +66,10 @@ def collate_test():
         "audio_path": [
             "/home/audio/1",
             "/home/audio/2",
+        ],
+        "sample_rate": [
+            16000,
+            16000,
         ],
     }
 

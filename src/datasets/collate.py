@@ -19,16 +19,23 @@ def collate_fn(dataset_items: list[dict]) -> dict[Union[torch.Tensor, list]]:
     return {
         "audio": [item["audio"] for item in dataset_items],
         "spectrogram": torch.nn.utils.rnn.pad_sequence(
-            [item["spectrogram"].transpose(-1, -2) for item in dataset_items],
+            [
+                item["spectrogram"].squeeze(0).transpose(-1, -2)
+                for item in dataset_items
+            ],
             batch_first=True,
         ).transpose(-1, -2),
-        "spectrogram_length": torch.Tensor(
-            [item["spectrogram"].shape[1] for item in dataset_items],
+        "spectrogram_length": torch.IntTensor(
+            [int(item["spectrogram"].shape[-1]) for item in dataset_items],
         ),
         "text": [item["text"] for item in dataset_items],
         "text_encoded": torch.nn.utils.rnn.pad_sequence(
-            [item["text_encoded"] for item in dataset_items],
+            [item["text_encoded"].transpose(-1, -2) for item in dataset_items],
             batch_first=True,
+        ).squeeze(-1),
+        "text_encoded_length": torch.IntTensor(
+            [int(item["text_encoded"].shape[-1]) for item in dataset_items],
         ),
         "audio_path": [item["audio_path"] for item in dataset_items],
+        "sample_rate": [item["sample_rate"] for item in dataset_items],
     }

@@ -21,14 +21,14 @@ class BeamSearchEncoder(CTCTextEncoder):
         Beam search decoding.
 
         Args:
-            log_probs (Tensor): Tensor of shape (B, len(alphabet), M) contains logits
+            log_probs (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
             log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
             beam_size (int): Number of words to save
         Returns:
             result (list[str]): decoded texts.
         """
 
-        log_probs = log_probs.cpu().numpy()
+        log_probs = log_probs.transpose(1, 2).cpu().numpy()
         result = [
             self._beam_search(inds, beam_size)[: int(ind_len)]
             for inds, ind_len in zip(log_probs, log_probs_length.numpy())

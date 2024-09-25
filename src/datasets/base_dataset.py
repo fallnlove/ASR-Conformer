@@ -30,6 +30,7 @@ class BaseDataset(Dataset):
         max_text_length=None,
         shuffle_index=False,
         instance_transforms=None,
+        log_spec=None,
     ):
         """
         Args:
@@ -62,6 +63,7 @@ class BaseDataset(Dataset):
         self.text_encoder = text_encoder
         self.target_sr = target_sr
         self.instance_transforms = instance_transforms
+        self.log_spec = log_spec
 
     def __getitem__(self, ind):
         """
@@ -84,20 +86,17 @@ class BaseDataset(Dataset):
         text = data_dict["text"]
         text_encoded = self.text_encoder.encode(text)
 
-        spectrogram = self.get_spectrogram(audio)
-
         instance_data = {
             "audio": audio,
-            "spectrogram": spectrogram,
             "text": text,
             "text_encoded": text_encoded,
             "audio_path": audio_path,
+            "sample_rate": self.target_sr,
         }
 
-        # TODO think of how to apply wave augs before calculating spectrogram
-        # Note: you may want to preserve both audio in time domain and
-        # in time-frequency domain for logging
         instance_data = self.preprocess_data(instance_data)
+
+        instance_data["spectrogram"] = self.get_spectrogram(instance_data["audio"])
 
         return instance_data
 
@@ -125,7 +124,13 @@ class BaseDataset(Dataset):
         Returns:
             spectrogram (Tensor): spectrogram for the audio.
         """
-        return self.instance_transforms["get_spectrogram"](audio)
+
+        spec = self.instance_transforms["get_spectrogram"](audio)
+
+        if self.log_spec is not None and self.log_spec:
+            spec = torch.log(spec + 1e-5)
+
+        return spec
 
     def preprocess_data(self, instance_data):
         """
