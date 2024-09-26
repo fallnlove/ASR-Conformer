@@ -9,7 +9,7 @@ import torch
 from scipy.special import softmax
 from torch import Tensor
 
-from src.text_encoder import CTCTextEncoder
+from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
 
 class BeamSearchEncoder(CTCTextEncoder):
