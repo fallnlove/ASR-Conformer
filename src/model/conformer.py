@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor, nn
 
-from src.model.basic_blocks import ConformerBlock
+from src.model.basic_blocks import ConformerBlock, SubSampling
 
 
 class Conformer(nn.Module):
@@ -20,11 +20,12 @@ class Conformer(nn.Module):
     ):
         super().__init__()
 
-        self.supsampling = nn.Conv1d(
-            in_channels=n_feats, out_channels=n_feats, kernel_size=4, stride=4
-        )
+        self.subsampling = SubSampling(hidden_dim=hidden_dim)
+
+        shape_after_subsamp = ((n_feats - 1) // 2 - 1) // 2 * hidden_dim
+
         self.in_layer = nn.Sequential(
-            nn.Linear(in_features=n_feats, out_features=hidden_dim),
+            nn.Linear(in_features=shape_after_subsamp, out_features=hidden_dim),
             nn.Dropout(p=p_drop),
         )
 
@@ -55,9 +56,9 @@ class Conformer(nn.Module):
 
         log_probs_length = self.transform_input_lengths(spectrogram_length)
         padding_mask = self._create_padding_mask(log_probs_length)
+        spectrogram = spectrogram.transpose(1, 2)
 
-        out = self.supsampling(spectrogram)
-        out = out.transpose(1, 2)
+        out = self.subsampling(spectrogram)
         out = self.in_layer(out)
 
         for layer in self.body:
@@ -79,7 +80,7 @@ class Conformer(nn.Module):
         Returns:
             output_lengths (Tensor): new temporal lengths
         """
-        return input_lengths // 4
+        return ((input_lengths - 1) // 2 - 1) // 2
 
     def _create_padding_mask(self, spectrogram_length):
         B = spectrogram_length.shape[0]

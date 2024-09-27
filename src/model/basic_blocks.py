@@ -181,3 +181,30 @@ class ConformerBlock(nn.Module):
         out = self.conv(out)
 
         return out
+
+
+class SubSampling(nn.Module):
+    def __init__(self, hidden_dim: int):
+        super().__init__()
+
+        self.subsampling = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=hidden_dim, kernel_size=3, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=hidden_dim, out_channels=hidden_dim, kernel_size=3, stride=2
+            ),
+            nn.ReLU(),
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Args:
+            x (Tensor): Tensor of shape (B, T, C)
+        Returns:
+            x (Tensor): Tensor of shape (B, T // 4, vocab_size)
+        """
+
+        out = self.subsampling(x.unsqueeze(1))
+        out = out.contiguous().transpose(1, 2)
+
+        return out.contiguous().view(x.shape[0], ((x.shape[1] - 1) // 2 - 1) // 2, -1)
