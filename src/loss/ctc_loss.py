@@ -15,6 +15,5 @@ class CTCLossWrapper(CTCLoss):
             input_lengths=log_probs_length,
             target_lengths=text_encoded_length,
         )
-        print(log_probs_length, text_encoded_length)
 
         return {"loss": loss}
