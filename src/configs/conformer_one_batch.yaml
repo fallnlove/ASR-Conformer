@@ -21,7 +21,7 @@ loss_function:
   zero_infinity: True
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder
-  use_bpe: False
+  use_bpe: True
 trainer:
   log_step: 50
   n_epochs: 50

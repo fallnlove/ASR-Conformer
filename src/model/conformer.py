@@ -56,8 +56,8 @@ class Conformer(nn.Module):
         log_probs_length = self.transform_input_lengths(spectrogram_length)
         padding_mask = self._create_padding_mask(log_probs_length)
 
-        # out = self.supsampling(spectrogram)
-        out = spectrogram.transpose(1, 2)
+        out = self.supsampling(spectrogram)
+        out = out.transpose(1, 2)
         out = self.in_layer(out)
 
         for layer in self.body:
@@ -79,7 +79,7 @@ class Conformer(nn.Module):
         Returns:
             output_lengths (Tensor): new temporal lengths
         """
-        return input_lengths // 1
+        return input_lengths // 4
 
     def _create_padding_mask(self, spectrogram_length):
         B = spectrogram_length.shape[0]

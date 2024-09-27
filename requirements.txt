@@ -15,6 +15,7 @@ editdistance
 datasets
 wget
 scipy==1.13.1
+tokenizers
 
 black
 isort

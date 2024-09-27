@@ -4,11 +4,12 @@ from string import ascii_lowercase
 from typing import List
 
 import torch
+from tokenizers import Tokenizer
 from torch import Tensor
 
 
 class CTCTextEncoder:
-    EMPTY_TOK = ""
+    EMPTY_TOK = "^"
 
     def __init__(self, use_bpe: bool = False, alphabet=None, **kwargs):
         """
@@ -28,6 +29,12 @@ class CTCTextEncoder:
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
 
+        if use_bpe:
+            self.tokenizer = Tokenizer.from_file("src/bpe/tokenizer.json")
+            self.char2ind = self.tokenizer.get_vocab()
+            self.ind2char = {v: k.lower() for k, v in self.char2ind.items()}
+            self.alphabet = [k.lower() for k in self.tokenizer.get_vocab()]
+
     def __len__(self):
         return len(self.vocab)
 
@@ -38,6 +45,10 @@ class CTCTextEncoder:
     def encode(self, text) -> torch.Tensor:
         text = self.normalize_text(text)
         try:
+            if self.use_bpe:
+                return torch.Tensor(self.tokenizer.encode(text.upper()).ids).unsqueeze(
+                    0
+                )
             return torch.Tensor([self.char2ind[char] for char in text]).unsqueeze(0)
         except KeyError:
             unknown_chars = set([char for char in text if char not in self.char2ind])
