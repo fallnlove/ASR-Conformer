@@ -49,7 +49,7 @@ class PositionalEncoding(nn.Module):
         Returns:
             x (Tensor): Tensor of shape (B, T, C)
         """
-        return x + self.embedding[: x.shape[1], :]
+        return x + self.embedding[: x.shape[1], :].to(x.device)
 
 
 class MultiHeadedSelfAttention(nn.Module):
@@ -177,7 +177,7 @@ class ConformerBlock(nn.Module):
         """
 
         out = self.ff(x)
-        out = self.mhsa(out, padding_mask=padding_mask)
+        out = self.mhsa(out, padding_mask=padding_mask.to(x.device))
         out = self.conv(out)
 
         return out
