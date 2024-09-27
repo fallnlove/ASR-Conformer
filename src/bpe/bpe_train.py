@@ -25,7 +25,7 @@ def main(config):
     )
 
     tokenizer.train([path], trainer)
-    tokenizer.save("tokenizer.json")
+    tokenizer.save("src/bpe/tokenizer.json")
     os.remove(path)
 
 
