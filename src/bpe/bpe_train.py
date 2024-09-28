@@ -12,7 +12,7 @@ from utils import download_file
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-@hydra.main(version_base=None, config_path="../configs", config_name="bpe")
+@hydra.main(version_base=None, config_path="../configs/bpe", config_name="baseline")
 def main(config):
     tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
     trainer = BpeTrainer(

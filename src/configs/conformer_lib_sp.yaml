@@ -2,8 +2,8 @@ defaults:
   - model: conformer
   - writer: wandb
   - metrics: example
-  - datasets: onebatchtest
-  - dataloader: example
+  - datasets: librispeech_train
+  - dataloader: base
   - transforms: example_only_instance
   - _self_
 optimizer:

@@ -1,6 +1,7 @@
 from itertools import repeat
 
 from hydra.utils import instantiate
+from torch.utils.data import ConcatDataset
 
 from src.datasets.collate import collate_fn
 from src.utils.init_utils import set_worker_seed
@@ -68,9 +69,17 @@ def get_dataloaders(config, text_encoder, device):
     dataloaders = {}
     for dataset_partition in config.datasets.keys():
         # dataset partition init
-        dataset = instantiate(
-            config.datasets[dataset_partition], text_encoder=text_encoder
-        )  # instance transforms are defined inside
+        datasets = []
+
+        for dataset in config.datasets[dataset_partition]:
+            datasets.append(
+                instantiate(dataset, text_encoder=text_encoder)
+            )  # instance transforms are defined inside)
+
+        if len(datasets) > 1:
+            dataset = ConcatDataset(datasets)
+        else:
+            dataset = datasets[0]
 
         partition_dataloader = instantiate(
             config.dataloader,
