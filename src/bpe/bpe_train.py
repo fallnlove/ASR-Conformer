@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 def main(config):
     tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
     trainer = BpeTrainer(
-        special_tokens=["[UNK]", "^", " "], vocab_size=config.num_tokens
+        special_tokens=["^", " ", "[UNK]"], vocab_size=config.num_tokens
     )
     tokenizer.pre_tokenizer = Whitespace()
 

@@ -31,9 +31,11 @@ class CTCTextEncoder:
 
         if use_bpe:
             self.tokenizer = Tokenizer.from_file("src/bpe/tokenizer.json")
-            self.char2ind = self.tokenizer.get_vocab()
-            self.ind2char = {v: k.lower() for k, v in self.char2ind.items()}
-            self.alphabet = [k.lower() for k in self.tokenizer.get_vocab()]
+            self.char2ind = {
+                k.lower(): v for k, v in self.tokenizer.get_vocab().items()
+            }
+            self.ind2char = {v: k for k, v in self.char2ind.items()}
+            self.alphabet = [k for k, _ in self.char2ind.items()]
 
     def __len__(self):
         return len(self.vocab)
