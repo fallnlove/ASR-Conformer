@@ -2,7 +2,7 @@ defaults:
   - model: conformer
   - writer: wandb
   - metrics: example
-  - datasets: librispeech_train
+  - datasets: librispeech_train_small
   - dataloader: base
   - transforms: example_only_instance
   - _self_
