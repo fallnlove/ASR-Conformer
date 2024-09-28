@@ -94,12 +94,11 @@ class Trainer(BaseTrainer):
         image = plot_spectrogram(spectrogram_for_plot)
         self.writer.add_image("spectrogram", image)
 
-    def log_audio(self, audio, sample_rate, audio_path, **batch):
+    def log_audio(self, audio, sample_rate, **batch):
         idx = randint(0, len(audio) - 1)
 
         audio_for_logging = audio[idx].detach().cpu()
-        name = Path(audio_path[idx]).name
-        self.writer.add_audio(name, audio_for_logging, sample_rate=sample_rate[idx])
+        self.writer.add_audio("audio", audio_for_logging, sample_rate=sample_rate[idx])
 
     def log_predictions(
         self, text, log_probs, log_probs_length, audio_path, examples_to_log=10, **batch
