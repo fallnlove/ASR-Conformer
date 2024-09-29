@@ -22,13 +22,14 @@ URL_LINKS = {
 
 
 class LibrispeechDataset(BaseDataset):
-    def __init__(self, part, data_dir=None, *args, **kwargs):
+    def __init__(self, part, data_dir=None, is_kaggle=False, *args, **kwargs):
         assert part in URL_LINKS or part == "train_all"
 
         if data_dir is None:
             data_dir = ROOT_PATH / "data" / "datasets" / "librispeech"
             data_dir.mkdir(exist_ok=True, parents=True)
         self._data_dir = data_dir
+        self.is_kaggle = is_kaggle
         if part == "train_all":
             index = sum(
                 [
@@ -44,6 +45,8 @@ class LibrispeechDataset(BaseDataset):
         super().__init__(index, *args, **kwargs)
 
     def _load_part(self, part):
+        if self.is_kaggle:
+            return
         arch_path = self._data_dir / f"{part}.tar.gz"
         print(f"Loading part {part}")
         wget.download(URL_LINKS[part], str(arch_path))
