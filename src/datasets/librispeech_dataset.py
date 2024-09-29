@@ -28,6 +28,8 @@ class LibrispeechDataset(BaseDataset):
         if data_dir is None:
             data_dir = ROOT_PATH / "data" / "datasets" / "librispeech"
             data_dir.mkdir(exist_ok=True, parents=True)
+        else:
+            data_dir = Path(data_dir).absolute().resolve()
         self._data_dir = data_dir
         self.is_kaggle = is_kaggle
         if part == "train_all":
@@ -58,13 +60,14 @@ class LibrispeechDataset(BaseDataset):
 
     def _get_or_load_index(self, part):
         index_path = self._data_dir / f"{part}_index.json"
-        if index_path.exists():
+        if index_path.exists() and not (self.is_kaggle):
             with index_path.open() as f:
                 index = json.load(f)
         else:
             index = self._create_index(part)
-            with index_path.open("w") as f:
-                json.dump(index, f, indent=2)
+            if not (self.is_kaggle):
+                with index_path.open("w") as f:
+                    json.dump(index, f, indent=2)
         return index
 
     def _create_index(self, part):
