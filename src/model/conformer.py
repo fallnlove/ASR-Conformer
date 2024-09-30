@@ -9,7 +9,7 @@ class Conformer(nn.Module):
         self,
         n_feats: int,
         n_tokens: int,
-        num_layers: int = 16,
+        num_layers: int = 6,
         hidden_dim: int = 144,
         num_heads_transformer: int = 4,
         expansion_factor_ff: int = 4,
