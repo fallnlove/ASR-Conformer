@@ -59,15 +59,18 @@ class LibrispeechDataset(BaseDataset):
         shutil.rmtree(str(self._data_dir / "LibriSpeech"))
 
     def _get_or_load_index(self, part):
-        index_path = self._data_dir / f"{part}_index.json"
-        if index_path.exists() and not (self.is_kaggle):
+        index_path = (
+            self._data_dir / f"{part}_index.json"
+            if not (self.is_kaggle)
+            else Path("index.json")
+        )
+        if index_path.exists():
             with index_path.open() as f:
                 index = json.load(f)
         else:
             index = self._create_index(part)
-            if not (self.is_kaggle):
-                with index_path.open("w") as f:
-                    json.dump(index, f, indent=2)
+            with index_path.open("w") as f:
+                json.dump(index, f, indent=2)
         return index
 
     def _create_index(self, part):
