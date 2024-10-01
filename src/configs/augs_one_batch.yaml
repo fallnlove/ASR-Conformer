@@ -2,15 +2,20 @@ defaults:
   - model: conformer
   - writer: wandb
   - metrics: wer_cer
-  - datasets: librispeech_train
-  - dataloader: base
-  - transforms: example_only_instance
+  - datasets: onebatchtest_augs
+  - dataloader: example
+  - transforms: spec_aug_gain
   - _self_
 optimizer:
   _target_: torch.optim.AdamW
   lr: 3e-4
 lr_scheduler:
-  _target_: src.scheduler.WarmupLR
+  _target_: torch.optim.lr_scheduler.OneCycleLR
+  max_lr: 1e-2
+  pct_start: 0.1
+  steps_per_epoch: ${trainer.epoch_len}
+  epochs: ${trainer.n_epochs}
+  anneal_strategy: cos
 loss_function:
   _target_: src.loss.CTCLossWrapper
   zero_infinity: True
@@ -19,8 +24,8 @@ text_encoder:
   use_bpe: True
 trainer:
   log_step: 50
-  n_epochs: 200
-  epoch_len: 300
+  n_epochs: 50
+  epoch_len: 200
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
   device: auto # device name or "auto"

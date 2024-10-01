@@ -2,9 +2,9 @@ defaults:
   - model: conformer
   - writer: wandb
   - metrics: wer_cer
-  - datasets: librispeech_train
+  - datasets: librispeech_train_large
   - dataloader: base
-  - transforms: example_only_instance
+  - transforms: spec_aug_gain
   - _self_
 optimizer:
   _target_: torch.optim.AdamW

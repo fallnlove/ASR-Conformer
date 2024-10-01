@@ -1,9 +1,9 @@
 defaults:
   - model: conformer
-  - metrics: example
+  - metrics: wer_cer
   - datasets: librispeech_test # we do not want to run inference on training data
   - dataloader: base
-  - transforms: example
+  - transforms: spec_aug_gain
   - _self_
 inferencer:
   device_tensors: ["data_object", "labels"] # which tensors should be on device (ex. GPU)

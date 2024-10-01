@@ -1,7 +1,7 @@
 defaults:
   - model: conformer
   - writer: wandb
-  - metrics: example
+  - metrics: wer_cer
   - datasets: onebatchtest
   - dataloader: example
   - transforms: example_only_instance
