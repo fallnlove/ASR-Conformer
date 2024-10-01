@@ -21,23 +21,11 @@ class WarmupLR(_LRScheduler):
 
     def get_lr(self):
         step_num = self.last_epoch + 1
-
         return [
-            group["lr"]
-            * self.warmup_steps**0.5
-            * min(step_num**-0.5, step_num * self.warmup_steps**-1.5)
-            for group in self.optimizer.param_groups
-        ]
-
-    def _get_closed_form_lr(self):
-        return [
-            base_lr
-            * (
-                self.warmup_steps**0.5
-                * min(
-                    (self.last_epoch + 1) ** -0.5,
-                    (self.last_epoch + 1) * self.warmup_steps**-1.5,
-                )
+            (
+                lr
+                * self.warmup_steps**0.5
+                * min(step_num**-0.5, step_num * self.warmup_steps**-1.5)
             )
-            for base_lr in self.base_lrs
+            for lr in self.base_lrs
         ]
