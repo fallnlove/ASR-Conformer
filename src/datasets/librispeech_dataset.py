@@ -62,7 +62,7 @@ class LibrispeechDataset(BaseDataset):
         index_path = (
             self._data_dir / f"{part}_index.json"
             if not (self.is_kaggle)
-            else Path("index.json")
+            else Path(f"{part}_index.json")
         )
         if index_path.exists():
             with index_path.open() as f:

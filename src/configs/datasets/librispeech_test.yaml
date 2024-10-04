@@ -1,5 +1,10 @@
-test:
+test_clean:
   - _target_: src.datasets.LibrispeechDataset
     part: "test-clean"
+    log_spec: True
+    instance_transforms: ${transforms.instance_transforms.inference}
+test_other:
+  - _target_: src.datasets.LibrispeechDataset
+    part: "test-other"
     log_spec: True
     instance_transforms: ${transforms.instance_transforms.inference}
