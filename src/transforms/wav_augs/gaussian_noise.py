@@ -13,7 +13,7 @@ class GaussianNoise(nn.Module):
         self.snr = Tensor([snr])
 
     def __call__(self, data: Tensor):
-        noise = torch.empty(data.size)
+        noise = torch.empty_like(data)
         noise.normal_(0, self.std)
         return (
             torchaudio.functional.add_noise(data, noise, self.snr)
