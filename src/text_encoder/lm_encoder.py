@@ -51,8 +51,8 @@ class LMEncoder(CTCTextEncoder):
 
         # log_probs = log_probs.transpose(1, 2).cpu().numpy()
         probs = [
-            inds[: int(ind_len)].numpy()
-            for inds, ind_len in zip(log_probs, log_probs_length.numpy())
+            inds[: int(ind_len)].cpu().numpy()
+            for inds, ind_len in zip(log_probs, log_probs_length.cpu().numpy())
         ]
         with multiprocessing.get_context("fork").Pool() as pool:
             text_list = self.decoder.decode_batch(pool, probs)
