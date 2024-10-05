@@ -1,0 +1,41 @@
+train:
+  get_spectrogram: # special key for getting spectrogram
+    _target_: torch.nn.Sequential # to apply several transforms sequentially
+    _args_:
+      - _target_: torchaudio.transforms.MelSpectrogram
+        sample_rate: 16000
+        n_fft: 480
+      - _target_: src.transforms.spec_augs.TimeStretch
+        prob: 0.2
+        rate_std: 0.1
+        n_freq: 128
+        hop_length: 240
+  audio: # name of the tensor on which we apply transform
+    _target_: torchvision.transforms.v2.Compose
+    transforms:
+      - _target_: src.transforms.wav_augs.Gain
+        prob: 1
+train_noise:
+  get_spectrogram: # special key for getting spectrogram
+    _target_: torch.nn.Sequential # to apply several transforms sequentially
+    _args_:
+      - _target_: torchaudio.transforms.MelSpectrogram
+        sample_rate: 16000
+        n_fft: 480
+      - _target_: src.transforms.spec_augs.TimeStretch
+        prob: 0.2
+        rate_std: 0.1
+        n_freq: 128
+        hop_length: 240
+  audio: # name of the tensor on which we apply transform
+    _target_: torchvision.transforms.v2.Compose
+    transforms:
+      - _target_: src.transforms.wav_augs.Gain
+        prob: 0.5
+      - _target_: src.transforms.wav_augs.GaussianNoise
+        prob: 0.5
+inference:
+  get_spectrogram:
+    _target_: torchaudio.transforms.MelSpectrogram
+    sample_rate: 16000
+    n_fft: 480

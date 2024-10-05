@@ -5,15 +5,17 @@ from torch import Tensor, nn
 
 
 class TimeStretch(nn.Module):
-    def __init__(self, prob: float, rate_std: float = 0.1):
+    def __init__(self, prob: float, rate_std: float = 0.1, *args, **kwargs):
         super().__init__()
         self.prob = prob
         self.rate_std = rate_std
-        self.stretch = torchaudio.transforms.TimeStretch()
+        self.stretch = torchaudio.transforms.TimeStretch(*args, **kwargs)
 
     def __call__(self, data: Tensor):
         return (
-            self.stretch(data, overriding_rate=self._rand())
+            self.stretch(data.unsqueeze(0), overriding_rate=self._rand())
+            .squeeze(0)
+            .absolute()
             if self.prob < random()
             else data
         )

@@ -1,4 +1,4 @@
 defaults:
   - batch_transforms: spec_aug
-  - instance_transforms: noise
+  - instance_transforms: spec_aug
   - _self_
