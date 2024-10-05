@@ -140,10 +140,8 @@ class Inferencer(BaseTrainer):
         current_id = batch_idx * batch_size
 
         for i in range(batch_size):
-            # clone because of
-            # https://github.com/pytorch/pytorch/issues/1995
-            pred_label = batch["pred_label"][i].clone()
-            label = batch["text"][i].clone()
+            pred_label = batch["pred_label"][i]
+            label = batch["text"][i]
 
             output_id = current_id + i
 

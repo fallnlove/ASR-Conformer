@@ -16,6 +16,9 @@ datasets
 wget
 scipy==1.13.1
 tokenizers
+flashlight-text
+git+https://github.com/kpu/kenlm.git
+pyctcdecode
 
 black
 isort

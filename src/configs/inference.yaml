@@ -5,9 +5,12 @@ defaults:
   - dataloader: base
   - transforms: spec_aug_gain
   - _self_
+text_encoder:
+  _target_: src.text_encoder.LMEncoder
+  use_bpe: True
 inferencer:
-  device_tensors: ["data_object", "labels"] # which tensors should be on device (ex. GPU)
+  device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
   save_path: "example" # any name here, can be a dataset name
   seed: 42
-  from_pretrained: "saved/model_best.pth" # path to the pretrained model
+  from_pretrained: "/Users/askartsyganov/Documents/ДЗ/3 курс/dla/dla-hw-1/saved/conformer_bpe/checkpoint-epoch170.pth" # path to the pretrained model

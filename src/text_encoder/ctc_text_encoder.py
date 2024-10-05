@@ -35,7 +35,7 @@ class CTCTextEncoder:
                 k.lower(): v for k, v in self.tokenizer.get_vocab().items()
             }
             self.ind2char = {v: k for k, v in self.char2ind.items()}
-            self.vocab = [k for k, _ in self.char2ind.items()]
+            self.vocab = [self.ind2char[i] for i in range(len(self.ind2char))]
 
     def __len__(self):
         return len(self.vocab)
