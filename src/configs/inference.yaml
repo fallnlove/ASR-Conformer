@@ -13,4 +13,4 @@ inferencer:
   device: auto # device name or "auto"
   save_path: "example" # any name here, can be a dataset name
   seed: 42
-  from_pretrained: "/Users/askartsyganov/Documents/ДЗ/3 курс/dla/dla-hw-1/saved/conformer_bpe/checkpoint-epoch170.pth" # path to the pretrained model
+  from_pretrained: "saved/conformer_bpe/checkpoint-epoch170.pth" # path to the pretrained model
