@@ -1,5 +1,6 @@
 defaults:
   - model: conformer
+  - writer: wandb
   - metrics: wer_cer
   - datasets: librispeech_test # we do not want to run inference on training data
   - dataloader: base
