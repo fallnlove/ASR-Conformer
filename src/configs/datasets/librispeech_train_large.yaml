@@ -17,7 +17,12 @@ train:
     max_text_length: 250
     log_spec: True
     instance_transforms: ${transforms.instance_transforms.train}
-val:
+val_clean:
+  - _target_: src.datasets.LibrispeechDataset
+    part: "dev-clean"
+    log_spec: True
+    instance_transforms: ${transforms.instance_transforms.inference}
+val_other:
   - _target_: src.datasets.LibrispeechDataset
     part: "dev-other"
     log_spec: True
