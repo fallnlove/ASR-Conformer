@@ -7,6 +7,6 @@ train:
         freq_mask_param: 27
       - _target_: src.transforms.spec_augs.TimeMasking
         prob: 0.2
-        time_mask_param: 15
+        time_mask_param: 60
 inference:
   null
