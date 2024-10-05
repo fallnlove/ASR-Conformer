@@ -6,7 +6,7 @@ from torch import Tensor, distributions, nn
 
 
 class GaussianNoise(nn.Module):
-    def __init__(self, prob: float, std: float = 0.05, snr: float = 10):
+    def __init__(self, prob: float, std: float = 0.05, snr: float = 15):
         super().__init__()
         self.prob = prob
         self.std = std
