@@ -18,7 +18,7 @@ class BeamSearchEncoder(CTCTextEncoder):
         self.use_lm = use_lm
 
         if use_lm:
-            self.lm = kenlm.Model("lm/test.arpa")
+            self.lm = kenlm.Model("data/lm/test.arpa")
 
     @abstractmethod
     def decode(
