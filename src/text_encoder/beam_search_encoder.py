@@ -18,7 +18,7 @@ class BeamSearchEncoder(CTCTextEncoder):
         self.use_lm = use_lm
 
         if use_lm:
-            self.lm = kenlm.Model("data/lm/test.arpa")
+            self.lm = kenlm.Model("data/lm/4-gram.arpa")
 
     @abstractmethod
     def decode(
@@ -48,7 +48,7 @@ class BeamSearchEncoder(CTCTextEncoder):
         Beam search.
 
         Args:
-            logits (np.ndarray): Matrix of shape (len(alphabet), M) contains logits
+            logits (np.ndarray): Matrix of shape (M, len(alphabet)) contains logits
             beam_size (int): Number of sentences to save
         Returns:
             text (str): decoded text.
@@ -62,14 +62,19 @@ class BeamSearchEncoder(CTCTextEncoder):
 
         final_dict = defaultdict(float)
 
-        for (position, last_char), prob in beam_dict.items():
-            final_dict[
-                (position + last_char).replace(self.EMPTY_TOK, "").strip()
-            ] += prob
+        for (position, _), prob in beam_dict.items():
+            final_dict[position] = prob
 
         result = []
         for sentence, prob in final_dict.items():
-            result.append([sentence, 10 ** self.lm.score(sentence) * 0.2 + 0.8 * prob])
+            result.append(
+                [
+                    sentence,
+                    10 ** self.lm.score(sentence) * 0.2 + 0.8 * prob
+                    if self.use_lm
+                    else prob,
+                ]
+            )
 
         return sorted(result, key=lambda x: -x[1])[0][0]
 
@@ -85,15 +90,18 @@ class BeamSearchEncoder(CTCTextEncoder):
         """
         new_dict = defaultdict(float)
 
-        for (position, last_char), prob in beam_dict.items():
-            for idx, p in enumerate(probs):
-                new_char = self.ind2char[idx]
-                if new_char == last_char:
-                    new_dict[(position, last_char)] += prob * p
+        for idx, p in enumerate(probs):
+            cur_char = self.ind2char[idx]
+            for (prefix, last_char), prob in beam_dict.items():
+                if cur_char == last_char:
+                    new_prefix = prefix
                 else:
-                    new_dict[
-                        ((position + last_char).replace(self.EMPTY_TOK, ""), new_char)
-                    ] += (prob * p)
+                    if cur_char != self.EMPTY_TOK:
+                        new_prefix = prefix + cur_char
+                    else:
+                        new_prefix = prefix
+
+                new_dict[(new_prefix, cur_char)] += prob * p
 
         return new_dict
 
