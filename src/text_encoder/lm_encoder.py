@@ -18,7 +18,7 @@ class LMEncoder(CTCTextEncoder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.lm = kenlm.Model("lm/test.arpa")
+        self.lm = kenlm.Model("data/lm/test.arpa")
 
     @abstractmethod
     def decode(
