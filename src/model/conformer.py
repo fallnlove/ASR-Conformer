@@ -68,7 +68,14 @@ class Conformer(nn.Module):
 
         log_probs = nn.functional.log_softmax(out, dim=-1)
 
-        return {"log_probs": log_probs, "log_probs_length": log_probs_length}
+        if not self.train:
+            out = nn.functional.softmax(out, dim=-1)
+
+        return {
+            "logits": out,
+            "log_probs": log_probs,
+            "log_probs_length": log_probs_length,
+        }
 
     def transform_input_lengths(self, input_lengths):
         """

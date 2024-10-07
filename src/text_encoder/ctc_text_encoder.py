@@ -59,7 +59,7 @@ class CTCTextEncoder:
             )
 
     @abstractmethod
-    def decode(self, log_probs: Tensor, log_probs_length: Tensor) -> List[str]:
+    def decode(self, logits: Tensor, log_probs_length: Tensor) -> List[str]:
         """
         Decoding wit CTC.
 
@@ -70,7 +70,7 @@ class CTCTextEncoder:
             result (list[str]): decoded texts.
         """
 
-        argmax_inds = log_probs.cpu().argmax(-1).numpy()
+        argmax_inds = logits.cpu().argmax(-1).numpy()
         result = [
             self._ctc_decode(inds[: int(ind_len)])
             for inds, ind_len in zip(argmax_inds, log_probs_length.numpy())

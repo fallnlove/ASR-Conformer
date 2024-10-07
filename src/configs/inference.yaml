@@ -6,7 +6,8 @@ defaults:
   - transforms: spec_aug_gain
   - _self_
 text_encoder:
-  _target_: src.text_encoder.LMEncoder
+  _target_: src.text_encoder.BeamSearchEncoder
+  use_lm: True
   use_bpe: True
 inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)

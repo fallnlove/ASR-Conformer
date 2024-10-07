@@ -4,8 +4,8 @@ from collections import defaultdict
 from string import ascii_lowercase
 from typing import List
 
+import kenlm
 import numpy as np
-import torch
 from scipy.special import softmax
 from torch import Tensor
 
@@ -13,44 +13,50 @@ from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
 
 class BeamSearchEncoder(CTCTextEncoder):
+    def __init__(self, use_lm: bool = False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.use_lm = use_lm
+
+        if use_lm:
+            self.lm = kenlm.Model("lm/test.arpa")
+
     @abstractmethod
     def decode(
-        self, log_probs: Tensor, log_probs_length: Tensor, beam_size: int = 50
+        self, logits: Tensor, log_probs_length: Tensor, beam_size: int = 50
     ) -> List[str]:
         """
         Beam search decoding.
 
         Args:
-            log_probs (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
+            logits (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
             log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
             beam_size (int): Number of words to save
         Returns:
             result (list[str]): decoded texts.
         """
 
-        log_probs = log_probs.transpose(1, 2).cpu().numpy()
+        logits = logits.cpu().numpy()
         result = [
-            self._beam_search(inds, beam_size)[: int(ind_len)]
-            for inds, ind_len in zip(log_probs, log_probs_length.numpy())
+            self._beam_search(inds[: int(ind_len)], beam_size)
+            for inds, ind_len in zip(logits, log_probs_length.numpy())
         ]
 
         return result
 
-    def _beam_search(self, log_probs: np.ndarray, beam_size: int = 50) -> str:
+    def _beam_search(self, logits: np.ndarray, beam_size: int = 50) -> str:
         """
         Beam search.
 
         Args:
-            log_probs (np.ndarray): Matrix of shape (len(alphabet), M) contains logits
+            logits (np.ndarray): Matrix of shape (len(alphabet), M) contains logits
             beam_size (int): Number of sentences to save
         Returns:
             text (str): decoded text.
         """
 
-        probs = softmax(log_probs)
         beam_dict = {("", self.EMPTY_TOK): 1.0}
 
-        for prob in probs.T:
+        for prob in logits:
             beam_dict = self._extend(prob, beam_dict)
             beam_dict = self._cut(beam_dict, beam_size)
 
@@ -61,7 +67,11 @@ class BeamSearchEncoder(CTCTextEncoder):
                 (position + last_char).replace(self.EMPTY_TOK, "").strip()
             ] += prob
 
-        return sorted(final_dict.items(), key=lambda x: -x[1])[0][0]
+        result = []
+        for sentence, prob in final_dict.items():
+            result.append([sentence, 10 ** self.lm.score(sentence) * 0.2 + 0.8 * prob])
+
+        return sorted(result, key=lambda x: -x[1])[0][0]
 
     def _extend(self, probs: np.ndarray, beam_dict: dict) -> dict:
         """

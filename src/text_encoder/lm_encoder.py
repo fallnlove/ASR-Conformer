@@ -5,9 +5,9 @@ from collections import defaultdict
 from string import ascii_lowercase
 from typing import List
 
+import kenlm
 import numpy as np
 import torch
-from pyctcdecode import build_ctcdecoder
 from scipy.special import softmax
 from torch import Tensor
 
@@ -18,17 +18,11 @@ class LMEncoder(CTCTextEncoder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        vocab = self.vocab
-        vocab[0] = ""
-
-        self.decoder = build_ctcdecoder(
-            vocab,
-            kenlm_model_path="data/lm/4-gram.arpa",
-        )
+        self.lm = kenlm.Model("lm/test.arpa")
 
     @abstractmethod
     def decode(
-        self, log_probs: Tensor, log_probs_length: Tensor, beam_size: int = 50
+        self, logits: Tensor, log_probs_length: Tensor, beam_size: int = 50
     ) -> List[str]:
         """
         Beam search decoding.
@@ -44,7 +38,7 @@ class LMEncoder(CTCTextEncoder):
         # log_probs = log_probs.transpose(1, 2).cpu().numpy()
         probs = [
             inds[: int(ind_len)].cpu().numpy()
-            for inds, ind_len in zip(log_probs, log_probs_length.cpu().numpy())
+            for inds, ind_len in zip(logits, log_probs_length.cpu().numpy())
         ]
         with multiprocessing.get_context("fork").Pool() as pool:
             text_list = self.decoder.decode_batch(pool, probs)

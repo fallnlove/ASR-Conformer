@@ -2,6 +2,7 @@ from pathlib import Path
 from random import randint
 
 import pandas as pd
+from torch import nn
 
 from src.logger.utils import plot_spectrogram
 from src.metrics.tracker import MetricTracker
