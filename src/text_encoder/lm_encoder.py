@@ -10,7 +10,6 @@ import torch
 from pyctcdecode import build_ctcdecoder
 from scipy.special import softmax
 from torch import Tensor
-from torchaudio.models.decoder import download_pretrained_files
 
 from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
@@ -19,19 +18,12 @@ class LMEncoder(CTCTextEncoder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        files = download_pretrained_files("librispeech-4-gram")
-
         vocab = self.vocab
         vocab[0] = ""
-        for i in range(4, len(vocab)):
-            if type(self.vocab[i]) != str or len(self.vocab[i]) == 1:
-                vocab[i] = vocab[i].upper()
-            else:
-                vocab[i] = vocab[i].upper()
 
         self.decoder = build_ctcdecoder(
             vocab,
-            kenlm_model_path=files.lm,
+            kenlm_model_path="../../data/lm/4-gram.arpa",
         )
 
     @abstractmethod

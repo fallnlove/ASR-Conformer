@@ -1,6 +1,5 @@
 defaults:
   - model: conformer
-  - writer: wandb
   - metrics: wer_cer
   - datasets: librispeech_test # we do not want to run inference on training data
   - dataloader: base
@@ -14,4 +13,4 @@ inferencer:
   device: auto # device name or "auto"
   save_path: "example" # any name here, can be a dataset name
   seed: 42
-  from_pretrained: "saved/conformer_bpe/checkpoint-epoch170.pth" # path to the pretrained model
+  from_pretrained: "model_best.pth" # path to the pretrained model
