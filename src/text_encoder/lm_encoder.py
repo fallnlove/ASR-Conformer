@@ -23,7 +23,7 @@ class LMEncoder(CTCTextEncoder):
 
         self.decoder = build_ctcdecoder(
             vocab,
-            kenlm_model_path="../../data/lm/4-gram.arpa",
+            kenlm_model_path="data/lm/4-gram.arpa",
         )
 
     @abstractmethod
