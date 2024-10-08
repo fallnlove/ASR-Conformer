@@ -19,11 +19,11 @@ text_encoder:
   use_bpe: True
 trainer:
   log_step: 50
-  n_epochs: 200
+  n_epochs: 500
   epoch_len: 300
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
-  from_pretrained: "saved/conformer_bpe/model_best.pth"
+  from_pretrained: "data/models/conformer_before_fine_tuning.pth"
   device: auto # device name or "auto"
   override: False # if True, will override the previous run with the same name
   monitor: "min val_other_WER" # "off" or "max/min metric_name", i.e. our goal is to maximize/minimize metric

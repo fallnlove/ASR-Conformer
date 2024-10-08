@@ -22,7 +22,7 @@ class BeamSearchEncoder(CTCTextEncoder):
 
     @abstractmethod
     def decode(
-        self, logits: Tensor, log_probs_length: Tensor, beam_size: int = 50
+        self, logits: Tensor, log_probs_length: Tensor, beam_size: int = 100
     ) -> List[str]:
         """
         Beam search decoding.
@@ -43,7 +43,7 @@ class BeamSearchEncoder(CTCTextEncoder):
 
         return result
 
-    def _beam_search(self, logits: np.ndarray, beam_size: int = 50) -> str:
+    def _beam_search(self, logits: np.ndarray, beam_size: int = 100) -> str:
         """
         Beam search.
 
@@ -70,7 +70,7 @@ class BeamSearchEncoder(CTCTextEncoder):
             result.append(
                 [
                     sentence,
-                    10 ** self.lm.score(sentence) / 2 + prob if self.use_lm else prob,
+                    self.lm.score(sentence) / 2 + prob if self.use_lm else prob,
                 ]
             )
 
