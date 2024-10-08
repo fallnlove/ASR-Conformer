@@ -6,8 +6,8 @@ from typing import List
 
 import kenlm
 import numpy as np
-from scipy.special import softmax
 from torch import Tensor
+from torch.nn.functional import softmax
 
 from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
@@ -35,7 +35,7 @@ class BeamSearchEncoder(CTCTextEncoder):
             result (list[str]): decoded texts.
         """
 
-        logits = logits.cpu().numpy()
+        logits = softmax(logits, -1).cpu().numpy()
         result = [
             self._beam_search(inds[: int(ind_len)], beam_size)
             for inds, ind_len in zip(logits, log_probs_length.numpy())
@@ -70,9 +70,7 @@ class BeamSearchEncoder(CTCTextEncoder):
             result.append(
                 [
                     sentence,
-                    10 ** self.lm.score(sentence) * 0.2 + 0.8 * prob
-                    if self.use_lm
-                    else prob,
+                    10 ** self.lm.score(sentence) / 2 + prob if self.use_lm else prob,
                 ]
             )
 
