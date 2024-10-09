@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import gdown
 
 URLS = {
@@ -7,7 +9,10 @@ URLS = {
 
 
 def main():
-    for url, path in URLS.keys():
+    path_gzip = Path("data/models").absolute().resolve()
+    path_gzip.mkdir(exist_ok=True, parents=True)
+
+    for url, path in URLS.items():
         gdown.download(url, path)
 
 

@@ -2,7 +2,7 @@ import re
 from abc import abstractmethod
 from collections import defaultdict
 from string import ascii_lowercase
-from typing import List
+from typing import List, Optional
 
 import kenlm
 import numpy as np
@@ -13,16 +13,17 @@ from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
 
 class BeamSearchEncoder(CTCTextEncoder):
-    def __init__(self, use_lm: bool = False, *args, **kwargs):
+    def __init__(self, use_lm: bool = False, beam_size: int = 32, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.use_lm = use_lm
+        self.beam_size = beam_size
 
         if use_lm:
             self.lm = kenlm.Model("data/lm/4-gram.arpa")
 
     @abstractmethod
     def decode(
-        self, logits: Tensor, log_probs_length: Tensor, beam_size: int = 100
+        self, logits: Tensor, log_probs_length: Tensor, beam_size: Optional[int] = None
     ) -> List[str]:
         """
         Beam search decoding.
@@ -30,20 +31,22 @@ class BeamSearchEncoder(CTCTextEncoder):
         Args:
             logits (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
             log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
-            beam_size (int): Number of words to save
+            beam_size (Optional[int]): Number of words to save
         Returns:
             result (list[str]): decoded texts.
         """
 
         logits = softmax(logits, -1).cpu().numpy()
         result = [
-            self._beam_search(inds[: int(ind_len)], beam_size)
+            self._beam_search(
+                inds[: int(ind_len)], self.beam_size if beam_size is None else beam_size
+            )
             for inds, ind_len in zip(logits, log_probs_length.numpy())
         ]
 
         return result
 
-    def _beam_search(self, logits: np.ndarray, beam_size: int = 100) -> str:
+    def _beam_search(self, logits: np.ndarray, beam_size) -> str:
         """
         Beam search.
 
