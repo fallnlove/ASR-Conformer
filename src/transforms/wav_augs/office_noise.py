@@ -17,7 +17,7 @@ class OfficeNoise(nn.Module):
 
     def __call__(self, data: Tensor):
         file = choice(os.listdir(self.data_dir))
-        noise, _ = torchaudio.load(file)
+        noise, _ = torchaudio.load(self.data_dir + file)
 
         left = randint(0, noise.shape[-1] - data.shape[-1] - 1)
         noise = noise[..., left : left + data.shape[-1]]
