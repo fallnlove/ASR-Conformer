@@ -5,9 +5,9 @@ from torch import Tensor, nn
 
 
 class TimeStretch(nn.Module):
-    def __init__(self, prob: float, rate_std: float = 0.1, *args, **kwargs):
+    def __init__(self, p: float, rate_std: float = 0.1, *args, **kwargs):
         super().__init__()
-        self.prob = prob
+        self.p = p
         self.rate_std = rate_std
         self.stretch = torchaudio.transforms.TimeStretch(*args, **kwargs)
 
@@ -16,7 +16,7 @@ class TimeStretch(nn.Module):
             self.stretch(data.unsqueeze(0), overriding_rate=self._rand())
             .squeeze(0)
             .absolute()
-            if self.prob < random()
+            if self.p < random()
             else data
         )
 

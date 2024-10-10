@@ -19,6 +19,7 @@ tokenizers
 flashlight-text
 git+https://github.com/kpu/kenlm.git
 gdown
+pyctcdecode
 
 black
 isort
