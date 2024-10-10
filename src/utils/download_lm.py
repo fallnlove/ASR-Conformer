@@ -2,7 +2,7 @@ import gzip
 import urllib.request
 from pathlib import Path
 
-URL = "https://www.openslr.org/resources/11/4-gram.arpa.gz"
+URL = "https://www.openslr.magicdatatech.com/resources/11/4-gram.arpa.gz"
 
 
 def main():

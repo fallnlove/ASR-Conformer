@@ -11,6 +11,8 @@ from utils import download_file
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
+URL = "https://www.openslr.magicdatatech.com/resources/11/librispeech-lm-norm.txt.gz"
+
 
 @hydra.main(version_base=None, config_path="../configs/bpe", config_name="baseline")
 def main(config):
@@ -20,9 +22,7 @@ def main(config):
     )
     tokenizer.pre_tokenizer = Whitespace()
 
-    path = download_file(
-        "https://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz"
-    )
+    path = download_file(URL)
 
     tokenizer.train([path], trainer)
     tokenizer.save("src/bpe/tokenizer.json")
