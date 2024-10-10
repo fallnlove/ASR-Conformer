@@ -12,15 +12,13 @@ PATH_MIT = "data/mit/reverb/Audio"
 URL_NOISE = "https://zenodo.org/records/1227121/files/OOFFICE_16k.zip?download=1"
 PATH_NOISE = "data/noise/OOFFICE"
 
-URL_LM = "https://www.openslr.magicdatatech.com/resources/11/4-gram.arpa.gz"
+URL_LM = "https://www.openslr.org/resources/11/4-gram.arpa.gz"
 PATH_LM = "data/lm/4-gram.arpa"
 
-URL_VOCAB = "https://www.openslr.magicdatatech.com/resources/11/librispeech-vocab.txt"
+URL_VOCAB = "https://www.openslr.org/resources/11/librispeech-vocab.txt"
 PATH_VOCAB = "data/lm/librispeech-vocab.txt"
 
-URL_CORPUS = (
-    "https://www.openslr.magicdatatech.com/resources/11/librispeech-lm-norm.txt.gz"
-)
+URL_CORPUS = "https://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz"
 PATH_CORPUS = "data/lm/librispeech-lm-norm.txt"
 
 
@@ -37,7 +35,7 @@ def download_mit() -> str:
     path_dir = path_dir / "reverb"
 
     if path_dir.exists():
-        return path_dir
+        return PATH_MIT
     path_dir.mkdir(exist_ok=True, parents=True)
 
     path_zip = path_dir / "Audio.zip"
@@ -65,7 +63,7 @@ def download_noise() -> str:
     path_dir = path_dir / "noise"
 
     if path_dir.exists():
-        return path_dir
+        return PATH_NOISE
     path_dir.mkdir(exist_ok=True, parents=True)
 
     path_zip = path_dir / "OOFFICE_16k.zip"
