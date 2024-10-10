@@ -17,6 +17,6 @@ class GaussianNoise(nn.Module):
         noise.normal_(0, self.std)
         return (
             torchaudio.functional.add_noise(data, noise, self.snr)
-            if self.p < random()
+            if random() < self.p
             else data
         )

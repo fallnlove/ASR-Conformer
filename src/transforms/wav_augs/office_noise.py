@@ -24,6 +24,6 @@ class OfficeNoise(nn.Module):
 
         return (
             torchaudio.functional.add_noise(data, noise, self.snr)
-            if self.p < random()
+            if random() < self.p
             else data
         )

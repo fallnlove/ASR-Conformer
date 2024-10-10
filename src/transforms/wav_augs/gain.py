@@ -12,4 +12,4 @@ class Gain(nn.Module):
 
     def __call__(self, data: Tensor):
         x = data.unsqueeze(1)
-        return self._aug(x).squeeze(1) if self.p < random() else data
+        return self._aug(x).squeeze(1) if random() < self.p else data
