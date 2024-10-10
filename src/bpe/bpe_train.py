@@ -7,11 +7,9 @@ from tokenizers.models import BPE
 from tokenizers.pre_tokenizers import Whitespace
 from tokenizers.trainers import BpeTrainer
 
-from utils import download_file
+from src.utils.download import download_lm_corpus
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
-URL = "https://www.openslr.magicdatatech.com/resources/11/librispeech-lm-norm.txt.gz"
 
 
 @hydra.main(version_base=None, config_path="../configs/bpe", config_name="baseline")
@@ -22,7 +20,7 @@ def main(config):
     )
     tokenizer.pre_tokenizer = Whitespace()
 
-    path = download_file(URL)
+    path = download_lm_corpus()
 
     tokenizer.train([path], trainer)
     tokenizer.save("src/bpe/tokenizer.json")

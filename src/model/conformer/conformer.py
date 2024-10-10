@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor, nn
 
-from src.model.basic_blocks import ConformerBlock, SubSampling
+from src.model.conformer.basic_blocks import ConformerBlock, SubSampling
 
 
 class Conformer(nn.Module):
@@ -49,9 +49,10 @@ class Conformer(nn.Module):
     def forward(self, spectrogram: Tensor, spectrogram_length, **batch) -> Tensor:
         """
         Args:
-            x (Tensor): Tensor of shape (B, C, T)
+            spectrogram (Tensor): Tensor of shape (B, C, T).
+            spectrogram_length (Tensor): Lengths tensor of shape (B,).
         Returns:
-            x (Tensor): Tensor of shape (B, T, vocab_size)
+            (dict): Logits of shape (B, T / 4, hidden_dim).
         """
 
         log_probs_length = self.transform_input_lengths(spectrogram_length)
@@ -68,11 +69,7 @@ class Conformer(nn.Module):
 
         log_probs = nn.functional.log_softmax(out, dim=-1)
 
-        if not self.train:
-            out = nn.functional.softmax(out, dim=-1)
-
         return {
-            "logits": out,
             "log_probs": log_probs,
             "log_probs_length": log_probs_length,
         }

@@ -13,30 +13,29 @@ from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
 
 class BeamSearchEncoder(CTCTextEncoder):
-    def __init__(self, use_lm: bool = False, beam_size: int = 32, *args, **kwargs):
+    def __init__(self, beam_size: int = 32, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.use_lm = use_lm
         self.beam_size = beam_size
-
-        if use_lm:
-            self.lm = kenlm.Model("data/lm/4-gram.arpa")
 
     @abstractmethod
     def decode(
-        self, logits: Tensor, log_probs_length: Tensor, beam_size: Optional[int] = None
+        self,
+        log_probs: Tensor,
+        log_probs_length: Tensor,
+        beam_size: Optional[int] = None,
     ) -> List[str]:
         """
         Beam search decoding.
 
         Args:
-            logits (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
+            log_probs (Tensor): Tensor of shape (B, M, len(alphabet)) contains logits
             log_probs_length (Tensor):  Tensor of shape (B,) contains length of spectrogram
             beam_size (Optional[int]): Number of words to save
         Returns:
             result (list[str]): decoded texts.
         """
 
-        logits = softmax(logits, -1).cpu().numpy()
+        logits = softmax(log_probs, -1).cpu().numpy()
         result = [
             self._beam_search(
                 inds[: int(ind_len)], self.beam_size if beam_size is None else beam_size
@@ -70,12 +69,7 @@ class BeamSearchEncoder(CTCTextEncoder):
 
         result = []
         for sentence, prob in final_dict.items():
-            result.append(
-                [
-                    sentence,
-                    self.lm.score(sentence) / 2 + prob if self.use_lm else prob,
-                ]
-            )
+            result.append([sentence, prob])
 
         return sorted(result, key=lambda x: -x[1])[0][0]
 
