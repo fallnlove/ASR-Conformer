@@ -27,8 +27,7 @@ def main(config):
 
     if config.writer is not None:
         project_config = OmegaConf.to_container(config)
-        logger = setup_saving_and_logging(config)
-        writer = instantiate(config.writer, logger, project_config)
+        writer = instantiate(config.writer, None, project_config)
 
     if config.inferencer.device == "auto":
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -60,6 +59,8 @@ def main(config):
         save_path = ROOT_PATH / "data" / "saved" / config.inferencer.save_path
         save_path.mkdir(exist_ok=True, parents=True)
 
+    log_step = config.inferencer.log_step if config.writer is not None else None
+
     inferencer = Inferencer(
         model=model,
         config=config,
@@ -71,6 +72,7 @@ def main(config):
         writer=writer,
         metrics=metrics,
         skip_model_load=False,
+        log_step=log_step,
     )
 
     logs = inferencer.run_inference()

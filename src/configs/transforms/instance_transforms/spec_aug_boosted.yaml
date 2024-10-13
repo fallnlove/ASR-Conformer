@@ -14,7 +14,10 @@ train:
     _target_: torchvision.transforms.v2.Compose
     transforms:
       - _target_: src.transforms.wav_augs.Gain
-        p: 1
+        p: 0.5
+      - _target_: src.transforms.wav_augs.PitchShift
+        p: 0.5
+        sample_rate: 16000
 train_noise:
   get_spectrogram: # special key for getting spectrogram
     _target_: torch.nn.Sequential # to apply several transforms sequentially
@@ -33,7 +36,15 @@ train_noise:
       - _target_: src.transforms.wav_augs.Gain
         p: 0.5
       - _target_: src.transforms.wav_augs.GaussianNoise
-        p: 0.5
+        p: 0.2
+      - _target_: src.transforms.wav_augs.ImpulseResponse
+        p: 0.2
+        sample_rate: 16000
+      - _target_: src.transforms.wav_augs.OfficeNoise
+        p: 0.2
+      - _target_: src.transforms.wav_augs.PitchShift
+        p: 0.2
+        sample_rate: 16000
 inference:
   get_spectrogram:
     _target_: torchaudio.transforms.MelSpectrogram

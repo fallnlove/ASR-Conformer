@@ -30,6 +30,7 @@ class Inferencer(BaseTrainer):
         metrics=None,
         batch_transforms=None,
         skip_model_load=False,
+        log_step=1,
     ):
         """
         Initialize the Inferencer.
@@ -77,6 +78,7 @@ class Inferencer(BaseTrainer):
         self.save_path = save_path
 
         self.writer = writer
+        self.log_step = log_step
 
         # define metrics
         self.metrics = metrics
@@ -145,9 +147,10 @@ class Inferencer(BaseTrainer):
         batch.update({"pred_label": logits})
 
         if self.save_path is not None:
-            self._log_predictions(self.save_path, batch)
-        if self.writer is not None:
-            self._log_predictions_writer(batch)
+            self._log_predictions(self.save_path, **batch)
+
+        if self.writer is not None and batch_idx % self.log_step == 0:
+            self._log_predictions_writer(**batch)
 
         return batch
 

@@ -13,5 +13,6 @@ inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
   save_path: null
+  log_step: 50
   seed: 42
   from_pretrained: "data/models/best_ctc_conformer.pth" # path to the pretrained model
