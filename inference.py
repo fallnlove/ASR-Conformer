@@ -1,4 +1,5 @@
 import warnings
+from pathlib import Path
 
 import hydra
 import torch
@@ -57,7 +58,7 @@ def main(config):
     # save_path for model predictions
     save_path = None
     if config.inferencer.save_path is not None:
-        save_path = config.inferencer.save_path
+        save_path = Path(config.inferencer.save_path)
         save_path.mkdir(exist_ok=True, parents=True)
 
     log_step = config.inferencer.log_step if "writer" in config else None

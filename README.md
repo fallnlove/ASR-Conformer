@@ -2,6 +2,8 @@
 
 Implementation of the ASR model based on the article [Conformer: Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/pdf/2005.08100).
 
+<img src="https://user-images.githubusercontent.com/1694368/101230439-4699f080-36e0-11eb-839f-5d70d21f1310.png" width="400"/>
+
 ||WER||CER||
 |-|-|-|-|-|
 |Inference type|test-clean|test-other|test-clean|test-other|
@@ -86,7 +88,7 @@ To calculate metrics(for ex. CER and WER) run this.
 ```bash
 python3 scripts/calculate_wer_cer.py -cn=calc_wer_cer \
 prediction_path=PATH_TO_DIR_WITH_PREDICTIONS \
-target_path=PATH_TO_GROUND_TRUTH_TEXT
+target_path=PATH_TO_GROUND_TRUTH_TEXTS
 ```
 
 ## Unit Tests

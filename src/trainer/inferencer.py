@@ -42,7 +42,7 @@ class Inferencer(BaseTrainer):
             dataloaders (dict[DataLoader]): dataloaders for different
                 sets of data.
             text_encoder (CTCTextEncoder): text encoder.
-            save_path (str): path to save model predictions and other
+            save_path (Path): path to save model predictions and other
                 information.
             writer (WandBWriter | CometMLWriter): experiment tracker.
             metrics (dict): dict with the definition of metrics for
