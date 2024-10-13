@@ -4,7 +4,7 @@ defaults:
   - writer: null
   - datasets: custom_dir_dataset
   - dataloader: base
-  - transforms: spec_aug_gain
+  - transforms: spec_aug
   - _self_
 text_encoder:
   _target_: src.text_encoder.LMEncoder

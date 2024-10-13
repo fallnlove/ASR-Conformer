@@ -4,7 +4,7 @@ defaults:
   - writer: wandb
   - datasets: librispeech_test # we do not want to run inference on training data
   - dataloader: base
-  - transforms: spec_aug_gain
+  - transforms: spec_aug
   - _self_
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder

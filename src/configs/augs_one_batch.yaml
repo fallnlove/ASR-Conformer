@@ -4,7 +4,7 @@ defaults:
   - metrics: wer_cer
   - datasets: onebatchtest_augs
   - dataloader: example
-  - transforms: spec_aug_gain
+  - transforms: spec_aug
   - _self_
 optimizer:
   _target_: torch.optim.AdamW
