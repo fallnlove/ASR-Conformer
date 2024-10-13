@@ -13,7 +13,7 @@ from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
 
 class BeamSearchEncoder(CTCTextEncoder):
-    def __init__(self, beam_size: int = 32, *args, **kwargs):
+    def __init__(self, beam_size: int = 16, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.beam_size = beam_size
 

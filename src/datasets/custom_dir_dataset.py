@@ -24,7 +24,7 @@ class CustomDirDataset(BaseDataset):
                     transc_path = transcription_dir / (path.stem + ".txt")
                     if transc_path.exists():
                         with transc_path.open() as f:
-                            entry["text"] = f.read().strip().lower()
+                            entry["text"] = f.read().strip().lower().replace("\n", "")
                 else:
                     entry["text"] = ""
             if len(entry) > 0:

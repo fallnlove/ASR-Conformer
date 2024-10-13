@@ -197,7 +197,7 @@ class Inferencer(BaseTrainer):
         tuples = list(zip(predicted_text, audio_path))
 
         for pred, audio_path in tuples:
-            with open(save_path / (str(Path(audio_path).stem) + ".txt")) as fout:
+            with open(save_path / (str(Path(audio_path).stem) + ".txt"), "w") as fout:
                 fout.write(pred)
 
     def _log_predictions_writer(

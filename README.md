@@ -1,78 +1,102 @@
-# Automatic Speech Recognition (ASR) with PyTorch
+# Automatic Speech Recognition (ASR) with Conformer
 
-<p align="center">
-  <a href="#about">About</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#how-to-use">How To Use</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#license">License</a>
-</p>
+Implementation of the ASR model based on the article [Conformer: Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/pdf/2005.08100).
 
-## About
-
-This repository contains a template for solving ASR task with PyTorch. This template branch is a part of the [HSE DLA course](https://github.com/markovka17/dla) ASR homework. Some parts of the code are missing (or do not follow the most optimal design choices...) and students are required to fill these parts themselves (as well as writing their own models, etc.).
-
-See the task assignment [here](https://github.com/markovka17/dla/tree/2024/hw1_asr).
+||WER||CER||
+|-|-|-|-|-|
+|Inference type|test-clean|test-other|test-clean|test-other|
+|CTCArgmax|19.37|36.06|6.80|15.59|
+|Beam Search(beam_size=16)|19.04|35.43|6.65|15.23|
+|LM(beam_size=10000)|12.84|27.02|5.34|14.09|
 
 ## Installation
 
-Follow these steps to install the project:
-
-0. (Optional) Create and activate new environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html) or `venv` ([`+pyenv`](https://github.com/pyenv/pyenv)).
-
-   a. `conda` version:
-
-   ```bash
-   # create env
-   conda create -n project_env python=PYTHON_VERSION
-
-   # activate env
-   conda activate project_env
-   ```
-
-   b. `venv` (`+pyenv`) version:
-
-   ```bash
-   # create env
-   ~/.pyenv/versions/PYTHON_VERSION/bin/python3 -m venv project_env
-
-   # alternatively, using default python version
-   python3 -m venv project_env
-
-   # activate env
-   source project_env
-   ```
-
-1. Install all required packages
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Install `pre-commit`:
-   ```bash
-   pre-commit install
-   ```
-
-## How To Use
-
-To train a model, run the following command:
+1. Install dependencies
 
 ```bash
-python3 train.py -cn=CONFIG_NAME HYDRA_CONFIG_ARGUMENTS
+pip install -r ./requirements.txt
 ```
 
-Where `CONFIG_NAME` is a config from `src/configs` and `HYDRA_CONFIG_ARGUMENTS` are optional arguments.
-
-To run inference (evaluate the model or save predictions):
+2. Install checkpoints and pre-trained model
 
 ```bash
-python3 inference.py HYDRA_CONFIG_ARGUMENTS
+python3 scripts/download_models.py
 ```
 
-## Credits
+## Training
 
-This repository is based on a [PyTorch Project Template](https://github.com/Blinorot/pytorch_project_template).
+If you want to reproduce training process following steps below.
+
+1. Train bpe encoder(default NUM_TOKENS=128)
+
+```bash
+pyhton3 src/bpe/bpe_train.py -cn=baseline num_tokens=NUM_TOKENS
+```
+
+2. Train Conformer on mix of Librispeech train-clean-100 and train-clean-360
+
+```bash
+pyhton3 train.py -cn=conformer_lib_sp
+```
+
+3. Fine-tune model on mix of Librispeech train-clean and train-other with [SpecAugment](https://arxiv.org/pdf/1904.08779)
+
+```bash
+pyhton3 train.py -cn=conformer_fine_tune trainer.from_pretrained=PATH_TO_LAST_CHECKPOINT
+```
+
+Note: default `PATH_TO_LAST_CHECKPOINT` is path to downloaded checkpoint, but you can use checkpoint of your training at the previous step.
+
+## Inference
+
+Repository provide various version of inference on Librispeech test set.
+
+1. Inference with Argmax
+
+```bash
+pyhton3 inference.py -cn=inference
+```
+
+2. Inference with BeamSearch
+
+```bash
+pyhton3 inference.py -cn=inference_beam_search
+```
+
+3. Inference with pre-trained LM. I use pre-trained LM on Librispeech train text corpus and [external library](https://github.com/kensho-technologies/pyctcdecode) for LM-based beam search
+
+```bash
+pyhton3 inference.py -cn=inference_lm
+```
+
+## Custom datatset inference
+
+If you want to inference model on custom dataset run following commands.
+
+```bash
+python3 inference.py -cn=custom_inference \
+datasets.dataset_dir=PATH_TO_CUSTOM_DATASET \
+inferencer.save_path=PATH_TO_DIR_TO_SAVE_PREDICTIONS
+```
+
+Note: `datasets.dataset_dir` should contain folder `audio` and may contain folder `transcriptions` for ground truth texts.
+
+To calculate metrics(for ex. CER and WER) run this.
+
+```bash
+python3 scripts/calculate_wer_cer.py -cn=calc_wer_cer \
+prediction_path=PATH_TO_DIR_WITH_PREDICTIONS \
+target_path=PATH_TO_GROUND_TRUTH_TEXT
+```
+
+## Unit Tests
+
+There are unit tests for functions `collate_fn`, `calc_wer`, `calc_cer` and for hand-crafted
+beam search. You can run tests with the following command.
+
+```bash
+pytest test.py
+```
 
 ## License
 

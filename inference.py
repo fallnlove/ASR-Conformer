@@ -25,7 +25,8 @@ def main(config):
     """
     set_random_seed(config.inferencer.seed)
 
-    if config.writer is not None:
+    writer = None
+    if "writer" in config:
         project_config = OmegaConf.to_container(config)
         writer = instantiate(config.writer, None, project_config)
 
@@ -56,10 +57,10 @@ def main(config):
     # save_path for model predictions
     save_path = None
     if config.inferencer.save_path is not None:
-        save_path = ROOT_PATH / "data" / "saved" / config.inferencer.save_path
+        save_path = config.inferencer.save_path
         save_path.mkdir(exist_ok=True, parents=True)
 
-    log_step = config.inferencer.log_step if config.writer is not None else None
+    log_step = config.inferencer.log_step if "writer" in config else None
 
     inferencer = Inferencer(
         model=model,
