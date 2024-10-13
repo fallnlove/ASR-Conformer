@@ -1,7 +1,11 @@
+from pathlib import Path
+
+import pandas as pd
 import torch
 from tqdm.auto import tqdm
 
 from src.metrics.tracker import MetricTracker
+from src.metrics.utils import calc_cer, calc_wer
 from src.trainer.base_trainer import BaseTrainer
 
 
@@ -22,6 +26,7 @@ class Inferencer(BaseTrainer):
         dataloaders,
         text_encoder,
         save_path,
+        writer=None,
         metrics=None,
         batch_transforms=None,
         skip_model_load=False,
@@ -38,6 +43,7 @@ class Inferencer(BaseTrainer):
             text_encoder (CTCTextEncoder): text encoder.
             save_path (str): path to save model predictions and other
                 information.
+            writer (WandBWriter | CometMLWriter): experiment tracker.
             metrics (dict): dict with the definition of metrics for
                 inference (metrics[inference]). Each metric is an instance
                 of src.metrics.BaseMetric.
@@ -70,12 +76,14 @@ class Inferencer(BaseTrainer):
 
         self.save_path = save_path
 
+        self.writer = writer
+
         # define metrics
         self.metrics = metrics
         if self.metrics is not None:
             self.evaluation_metrics = MetricTracker(
                 *[m.name for m in self.metrics["inference"]],
-                writer=None,
+                writer=writer,
             )
         else:
             self.evaluation_metrics = None
@@ -136,23 +144,10 @@ class Inferencer(BaseTrainer):
         logits = self.text_encoder.decode(batch["log_probs"], batch["log_probs_length"])
         batch.update({"pred_label": logits})
 
-        batch_size = len(logits)
-        current_id = batch_idx * batch_size
-
-        for i in range(batch_size):
-            pred_label = batch["pred_label"][i]
-            label = batch["text"][i]
-
-            output_id = current_id + i
-
-            output = {
-                "pred_label": pred_label,
-                "label": label,
-            }
-
-            if self.save_path is not None:
-                # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
+        if self.save_path is not None:
+            self._log_predictions(self.save_path, batch)
+        if self.writer is not None:
+            self._log_predictions_writer(batch)
 
         return batch
 
@@ -174,7 +169,7 @@ class Inferencer(BaseTrainer):
 
         # create Save dir
         if self.save_path is not None:
-            (self.save_path / part).mkdir(exist_ok=True, parents=True)
+            self.save_path.mkdir(exist_ok=True, parents=True)
 
         with torch.no_grad():
             for batch_idx, batch in tqdm(
@@ -190,3 +185,37 @@ class Inferencer(BaseTrainer):
                 )
 
         return self.evaluation_metrics.result()
+
+    def _log_predictions(
+        self, save_path, log_probs, log_probs_length, audio_path, **batch
+    ):
+        predicted_text = self.text_encoder.decode(log_probs, log_probs_length)
+
+        tuples = list(zip(predicted_text, audio_path))
+
+        for pred, audio_path in tuples:
+            with open(save_path / (str(Path(audio_path).stem) + ".txt")) as fout:
+                fout.write(pred)
+
+    def _log_predictions_writer(
+        self, text, log_probs, log_probs_length, audio_path, examples_to_log=10, **batch
+    ):
+        predicted_text = self.text_encoder.decode(log_probs, log_probs_length)
+
+        tuples = list(zip(predicted_text, text, audio_path))
+
+        rows = {}
+        for pred, target, audio_path in tuples[:examples_to_log]:
+            target = self.text_encoder.normalize_text(target)
+            wer = calc_wer(target, pred) * 100
+            cer = calc_cer(target, pred) * 100
+
+            rows[Path(audio_path).name] = {
+                "target": target,
+                "predictions": pred,
+                "wer": wer,
+                "cer": cer,
+            }
+        self.writer.add_table(
+            "predictions", pd.DataFrame.from_dict(rows, orient="index")
+        )

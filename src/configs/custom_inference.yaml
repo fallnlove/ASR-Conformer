@@ -1,17 +1,17 @@
 defaults:
   - model: conformer
   - metrics: wer_cer
-  - writer: wandb
-  - datasets: librispeech_test # we do not want to run inference on training data
+  - writer: null
+  - datasets: custom_dir_dataset
   - dataloader: base
   - transforms: spec_aug_gain
   - _self_
 text_encoder:
-  _target_: src.text_encoder.BeamSearchEncoder
+  _target_: src.text_encoder.LMEncoder
   use_bpe: True
 inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
-  save_path: null
+  save_path: "custom_dataset" # any name here, can be a dataset name
   seed: 42
   from_pretrained: "data/models/best_ctc_conformer.pth" # path to the pretrained model
