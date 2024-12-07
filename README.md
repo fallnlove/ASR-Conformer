@@ -19,7 +19,7 @@ Implementation of the ASR model based on the article [Conformer: Convolution-aug
 pip install -r ./requirements.txt
 ```
 
-2. Install checkpoints and pre-trained model
+2. Download checkpoints and pre-trained model
 
 ```bash
 python3 scripts/download_models.py
@@ -71,7 +71,7 @@ pyhton3 inference.py -cn=inference_beam_search
 pyhton3 inference.py -cn=inference_lm
 ```
 
-## Custom datatset inference
+## Custom dataset inference
 
 If you want to inference model on custom dataset run following commands.
 
